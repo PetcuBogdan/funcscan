@@ -14,6 +14,8 @@ include { DEEPBGC_PIPELINE                         } from '../../modules/nf-core
 include { COMBGC                                   } from '../../modules/local/combgc'
 include { TABIX_BGZIP as BGC_TABIX_BGZIP           } from '../../modules/nf-core/tabix/bgzip/main'
 include { MERGE_TAXONOMY_COMBGC                    } from '../../modules/local/merge_taxonomy_combgc'
+include { bigscape as BIGSCAPE                     } from '../../modules/local/bigscape'
+include { bigscape_setup as BIGSCAPE_SETUP         } from '../../modules/local/bigscape_setup'
 
 workflow BGC {
     take:
@@ -95,6 +97,16 @@ workflow BGC {
             }
 
         ch_bgcresults_for_combgc = ch_bgcresults_for_combgc.mix(ch_antismashresults_for_combgc)
+
+        // BIGSCAPE
+        // === BIGSCAPE SETUP ===       
+        BIGSCAPE_SETUP()
+        //ch_bigscape_pfam_dir = BIGSCAPE_SETUP.out.pfam_files
+        ANTISMASH_ANTISMASHLITE.out.gbk_results.view()
+        // === BIGSCAPE RUN ===
+        //BIGSCAPE(ANTISMASH_ANTISMASHLITE.out.gbk_results, ch_bigscape_pfam_dir)
+        //ch_bigscape_out = BIGSCAPE.out.bigscape_output
+        //sch_versions = ch_versions.mix(BIGSCAPE.out.versions)
     }
 
     // DEEPBGC
