@@ -17,6 +17,8 @@ include { MERGE_TAXONOMY_COMBGC                    } from '../../modules/local/m
 include { bigscape as BIGSCAPE                     } from '../../modules/local/bigscape'
 include { bigscape_setup as BIGSCAPE_SETUP         } from '../../modules/local/bigscape_setup'
 
+params.pfam_dir = './pfam_db'
+
 workflow BGC {
     take:
     fastas // tuple val(meta), path(PREPPED_INPUT.out.fna)
@@ -98,15 +100,28 @@ workflow BGC {
 
         ch_bgcresults_for_combgc = ch_bgcresults_for_combgc.mix(ch_antismashresults_for_combgc)
 
-        // BIGSCAPE
-        // === BIGSCAPE SETUP ===       
+       // BIGSCAPE setup 
         BIGSCAPE_SETUP()
-        //ch_bigscape_pfam_dir = BIGSCAPE_SETUP.out.pfam_files
-        ANTISMASH_ANTISMASHLITE.out.gbk_results.view()
-        // === BIGSCAPE RUN ===
-        //BIGSCAPE(ANTISMASH_ANTISMASHLITE.out.gbk_results, ch_bigscape_pfam_dir)
-        //ch_bigscape_out = BIGSCAPE.out.bigscape_output
-        //sch_versions = ch_versions.mix(BIGSCAPE.out.versions)
+
+        //PFAM directory
+        Channel
+            .fromPath(params.pfam_dir)
+            .set { pfam_ch } 
+
+        // Collect directories of antismash results
+        ch_bigscape_input = ANTISMASH_ANTISMASHLITE.out.html
+            .map { meta, html -> html.parent }
+            .distinct()
+            .collect() // lista cu toate folderele CAPES_x
+            .combine(Channel.fromPath(params.pfam_dir))
+            .view { tuple_val ->
+                def (capes_folders, pfam_dir) = tuple_val
+                return "CAPES folders: ${capes_folders}\nPfam dir: ${pfam_dir}"
+            }
+            // Create a channel with a single tuple containing the id and the list of directories
+
+        //call BIGSCAPE 
+        BIGSCAPE(ch_bigscape_input)
     }
 
     // DEEPBGC
