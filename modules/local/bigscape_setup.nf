@@ -1,9 +1,9 @@
 process bigscape_setup {
-    label 'pfam_download'
-    publishDir './pfam_db', mode: 'copy'
+    container 'quay.io/biocontainers/bigscape:1.1.9--pyhdfd78af_0'
+    publishDir "${params.pfam_dir}", mode: 'copy'
 
     output:
-    path 'Pfam-A.hmm*'
+    path 'Pfam-A.hmm*', emit: pfam_files
 
     script:
     """

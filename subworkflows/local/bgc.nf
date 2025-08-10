@@ -17,8 +17,6 @@ include { MERGE_TAXONOMY_COMBGC                    } from '../../modules/local/m
 include { bigscape as BIGSCAPE                     } from '../../modules/local/bigscape'
 include { bigscape_setup as BIGSCAPE_SETUP         } from '../../modules/local/bigscape_setup'
 
-params.pfam_dir = './pfam_db'
-
 workflow BGC {
     take:
     fastas // tuple val(meta), path(PREPPED_INPUT.out.fna)
@@ -100,28 +98,23 @@ workflow BGC {
 
         ch_bgcresults_for_combgc = ch_bgcresults_for_combgc.mix(ch_antismashresults_for_combgc)
 
-       // BIGSCAPE setup 
-        BIGSCAPE_SETUP()
+        if (params.bgs_bigscape) {
+            // Run the process to download and prepare Pfam database
+            pfam_ch = BIGSCAPE_SETUP()
 
-        //PFAM directory
-        Channel
-            .fromPath(params.pfam_dir)
-            .set { pfam_ch } 
+            // Store the Pfam directory path as a File object
+            pfam_dir_path = file(params.pfam_dir)
 
-        // Collect directories of antismash results
-        ch_bigscape_input = ANTISMASH_ANTISMASHLITE.out.html
-            .map { meta, html -> html.parent }
-            .distinct()
-            .collect() // lista cu toate folderele CAPES_x
-            .combine(Channel.fromPath(params.pfam_dir))
-            .view { tuple_val ->
-                def (capes_folders, pfam_dir) = tuple_val
-                return "CAPES folders: ${capes_folders}\nPfam dir: ${pfam_dir}"
-            }
-            // Create a channel with a single tuple containing the id and the list of directories
+            // Collect antiSMASH output directories (CAPES_x) for BiG-SCAPE input
+            ch_bigscape_input = ANTISMASH_ANTISMASHLITE.out.html
+                .map { meta, html -> html.parent }
+                .distinct()
+                .collect()
+                .map { capes_list -> tuple(capes_list, pfam_dir_path) }
 
-        //call BIGSCAPE 
-        BIGSCAPE(ch_bigscape_input)
+            // Run the BiG-SCAPE process
+            BIGSCAPE(ch_bigscape_input)
+        }
     }
 
     // DEEPBGC
