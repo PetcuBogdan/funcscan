@@ -28,9 +28,9 @@ EOF
           --input "\$dir" \\
           --outputdir "\$outdir" \\
           --pfam_dir "${pfam_dir}" \\
-          --mode auto \\
-          --cutoffs 0.3 \\
-           --clan_cutoff 0.3 0.8 \\
+         --mode "${params.bigscape_mode}" \\
+         --cutoffs "${params.bigscape_cutoffs}" \\
+         --clan_cutoff ${params.bigscape_clan_cutoff} \\
           --cores ${task.cpus}
     done < ${capes_list_file}
 
