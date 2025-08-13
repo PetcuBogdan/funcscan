@@ -1297,6 +1297,46 @@
             },
             "fa_icon": "fas fa-angle-double-right"
         },
+        "bigscape": {
+            "title": "BGC: BiG-SCAPE",
+            "type": "object",
+            "description": "Run BiG-SCAPE for BGC similarity network analysis. More info: https://git.wur.nl/medema-group/BiG-SCAPE",
+            "default": "",
+            "properties": {
+                "bgs_bigscape": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Run BiG-SCAPE analysis",
+                    "fa_icon": "fas fa-toggle-on",
+                    "help_text": "Enable BiG-SCAPE for BGC similarity network construction. Requires antiSMASH output (.gbk files)."
+                },
+                "bigscape_mode": {
+                    "type": "string",
+                    "default": "auto",
+                    "enum": ["auto", "glocal", "global"],
+                    "description": "BiG-SCAPE mode",
+                    "fa_icon": "fas fa-cogs",
+                    "help_text": "Mode for BiG-SCAPE analysis: auto, glocal, or global."
+                },
+                "bigscape_cutoffs": {
+                    "type": "number",
+                    "default": 0.3,
+                    "minimum": 0,
+                    "maximum": 1,
+                    "description": "Cutoff value for similarity",
+                    "fa_icon": "fas fa-sliders-h",
+                    "help_text": "Similarity cutoff for BiG-SCAPE clustering (0.0 to 1.0)."
+                },
+                "bigscape_clan_cutoff": {
+                    "type": "string",
+                    "default": "0.3 0.8",
+                    "description": "Clan cutoff values",
+                    "fa_icon": "fas fa-sliders-h",
+                    "help_text": "Two cutoff values for clan clustering in BiG-SCAPE, separated by a space (e.g., '0.3 0.8')."
+                }
+            },
+            "fa_icon": "fas fa-project-diagram"
+        },
         "bgc_deepbgc": {
             "title": "BGC: DeepBGC",
             "type": "object",

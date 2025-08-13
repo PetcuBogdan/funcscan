@@ -30,7 +30,7 @@ EOF
           --pfam_dir "${pfam_dir}" \\
          --mode "${params.bigscape_mode}" \\
          --cutoffs "${params.bigscape_cutoffs}" \\
-         --clan_cutoff ${params.bigscape_clan_cutoff} \\
+        --clan_cutoff ${params.bigscape_clan_cutoff} \\
           --cores ${task.cpus}
     done < ${capes_list_file}
 
